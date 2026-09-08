@@ -4,7 +4,10 @@
 --
 -- Every function here is:
 --   * SECURITY DEFINER with a pinned search_path, so the caller needs no
---     table privileges of its own,
+--     table privileges of its own. Ownership is reassigned in file 14 to
+--     erp_tools_owner, a NOLOGIN role holding read-only access to erp --
+--     so SECURITY DEFINER escalates to "may read the business data" and
+--     never to superuser,
 --   * STABLE, so it is structurally incapable of writing,
 --   * guarded by tools.assert_authorized(), so the access-control result
 --     is an enforced property rather than a prompt instruction,
@@ -19,8 +22,8 @@
 -- ---------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION tools.assert_authorized(p_scope TEXT)
 RETURNS VOID
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 DECLARE
     v_role TEXT := erp.current_role_code();
@@ -46,8 +49,8 @@ COMMENT ON FUNCTION tools.assert_authorized(TEXT) IS 'Role-to-scope matrix. USER
 -- ---------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION tools.resolve_entity(p_kind TEXT, p_text TEXT, p_limit INT DEFAULT 5)
 RETURNS TABLE (entity_id BIGINT, entity_name TEXT, similarity REAL)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     IF UPPER(p_kind) = 'PRODUCT' THEN
@@ -89,8 +92,8 @@ RETURNS TABLE (period_start DATE, period_end DATE, invoice_count BIGINT,
                units_sold NUMERIC, net_revenue NUMERIC, total_discount NUMERIC,
                cogs NUMERIC, gross_profit NUMERIC, gross_margin_pct NUMERIC,
                avg_order_value NUMERIC, active_customers BIGINT)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     PERFORM tools.assert_authorized('SALES');
@@ -117,8 +120,8 @@ $$;
 CREATE OR REPLACE FUNCTION tools.get_sales_series(p_start DATE, p_end DATE, p_granularity TEXT DEFAULT 'day')
 RETURNS TABLE (bucket DATE, invoice_count BIGINT, units_sold NUMERIC,
                net_revenue NUMERIC, gross_profit NUMERIC)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 DECLARE
     v_gran TEXT := LOWER(p_granularity);
@@ -148,8 +151,8 @@ CREATE OR REPLACE FUNCTION tools.get_top_products(p_start DATE, p_end DATE,
                                                   p_rank_by TEXT DEFAULT 'revenue')
 RETURNS TABLE (product_id BIGINT, sku TEXT, product_name TEXT, category_name TEXT,
                units_sold NUMERIC, net_revenue NUMERIC, gross_profit NUMERIC, margin_pct NUMERIC)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 DECLARE
     v_by TEXT := LOWER(p_rank_by);
@@ -180,8 +183,8 @@ $$;
 CREATE OR REPLACE FUNCTION tools.get_discount_analysis(p_start DATE, p_end DATE)
 RETURNS TABLE (bucket DATE, avg_discount_pct NUMERIC, total_discount NUMERIC,
                net_revenue NUMERIC, discount_share_pct NUMERIC, lines_discounted BIGINT, lines_total BIGINT)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     PERFORM tools.assert_authorized('SALES');
@@ -204,8 +207,8 @@ $$;
 
 CREATE OR REPLACE FUNCTION tools.get_product_sales_series(p_product_id BIGINT, p_start DATE, p_end DATE)
 RETURNS TABLE (sale_date DATE, units_sold NUMERIC, net_revenue NUMERIC, avg_unit_price NUMERIC, avg_discount_pct NUMERIC)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     PERFORM tools.assert_authorized('SALES');
@@ -229,8 +232,8 @@ $$;
 
 CREATE OR REPLACE FUNCTION tools.get_profit_breakdown(p_start DATE, p_end DATE)
 RETURNS TABLE (component TEXT, amount NUMERIC, note TEXT)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 DECLARE
     v_rev  NUMERIC := 0;
@@ -265,8 +268,8 @@ CREATE OR REPLACE FUNCTION tools.compare_periods(p_curr_start DATE, p_curr_end D
                                                  p_prev_start DATE, p_prev_end DATE)
 RETURNS TABLE (metric TEXT, current_value NUMERIC, previous_value NUMERIC,
                absolute_change NUMERIC, percent_change NUMERIC)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     PERFORM tools.assert_authorized('FINANCE');
@@ -289,8 +292,8 @@ CREATE OR REPLACE FUNCTION tools.get_expense_summary(p_start DATE, p_end DATE,
                                                      p_prev_end DATE DEFAULT NULL)
 RETURNS TABLE (category_name TEXT, is_fixed_cost BOOLEAN, current_amount NUMERIC,
                previous_amount NUMERIC, absolute_change NUMERIC, percent_change NUMERIC, entry_count BIGINT)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     PERFORM tools.assert_authorized('FINANCE');
@@ -328,8 +331,8 @@ CREATE OR REPLACE FUNCTION tools.get_inventory_status(p_only_at_risk BOOLEAN DEF
 RETURNS TABLE (product_id BIGINT, sku TEXT, product_name TEXT, stock_on_hand NUMERIC,
                reorder_level NUMERIC, avg_daily_sold_30d NUMERIC, days_of_cover NUMERIC,
                stock_state TEXT, stock_value_at_cost NUMERIC)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     PERFORM tools.assert_authorized('INVENTORY');
@@ -346,8 +349,8 @@ $$;
 CREATE OR REPLACE FUNCTION tools.get_stockout_risk(p_horizon_days INT DEFAULT 14)
 RETURNS TABLE (product_id BIGINT, sku TEXT, product_name TEXT, stock_on_hand NUMERIC,
                avg_daily_sold_30d NUMERIC, projected_stock NUMERIC, days_of_cover NUMERIC, at_risk BOOLEAN)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     PERFORM tools.assert_authorized('INVENTORY');
@@ -366,8 +369,8 @@ CREATE OR REPLACE FUNCTION tools.get_slow_moving_products(p_lookback_days INT DE
                                                           p_max_units NUMERIC DEFAULT 5)
 RETURNS TABLE (product_id BIGINT, sku TEXT, product_name TEXT, units_sold NUMERIC,
                stock_on_hand NUMERIC, stock_value_at_cost NUMERIC, last_sold_on DATE)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     PERFORM tools.assert_authorized('INVENTORY');
@@ -394,8 +397,8 @@ $$;
 CREATE OR REPLACE FUNCTION tools.get_stock_movements(p_product_id BIGINT, p_start DATE, p_end DATE)
 RETURNS TABLE (movement_date DATE, movement_type TEXT, quantity NUMERIC,
                signed_quantity NUMERIC, running_balance NUMERIC, reference_type TEXT, reference_id BIGINT)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     PERFORM tools.assert_authorized('INVENTORY');
@@ -416,8 +419,8 @@ $$;
 CREATE OR REPLACE FUNCTION tools.get_top_customers(p_start DATE, p_end DATE, p_limit INT DEFAULT 10)
 RETURNS TABLE (customer_id BIGINT, customer_name TEXT, customer_type TEXT,
                invoice_count BIGINT, net_revenue NUMERIC, gross_profit NUMERIC, avg_order_value NUMERIC)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     PERFORM tools.assert_authorized('CUSTOMER');
@@ -441,8 +444,8 @@ CREATE OR REPLACE FUNCTION tools.get_customer_purchase_change(p_curr_start DATE,
                                                               p_min_abs_pct NUMERIC DEFAULT 20)
 RETURNS TABLE (customer_id BIGINT, customer_name TEXT, current_revenue NUMERIC,
                previous_revenue NUMERIC, absolute_change NUMERIC, percent_change NUMERIC, change_direction TEXT)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     PERFORM tools.assert_authorized('CUSTOMER');
@@ -488,8 +491,8 @@ CREATE OR REPLACE FUNCTION tools.get_supplier_price_changes(p_curr_start DATE, p
                                                             p_min_abs_pct NUMERIC DEFAULT 10)
 RETURNS TABLE (supplier_id BIGINT, supplier_name TEXT, product_id BIGINT, product_name TEXT,
                current_avg_cost NUMERIC, previous_avg_cost NUMERIC, percent_change NUMERIC, units_purchased NUMERIC)
-LANGUAGE plpgsql STABLE
-SET search_path = erp, pg_temp
+LANGUAGE plpgsql STABLE SECURITY DEFINER
+SET search_path = erp, public, pg_temp
 AS $$
 BEGIN
     PERFORM tools.assert_authorized('SUPPLIER');

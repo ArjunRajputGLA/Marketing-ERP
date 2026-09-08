@@ -28,6 +28,12 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'erp_readonly') THEN
         CREATE ROLE erp_readonly LOGIN PASSWORD 'change_me_readonly';
     END IF;
+    -- Owns the SECURITY DEFINER functions in tools. NOLOGIN: nothing ever
+    -- connects as this role, it exists only to bound what those functions
+    -- can reach. No password, so there is none to leak or rotate.
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'erp_tools_owner') THEN
+        CREATE ROLE erp_tools_owner NOLOGIN;
+    END IF;
 END;
 $$;
 
@@ -35,6 +41,7 @@ COMMENT ON ROLE erp_app        IS 'Next.js application. Full DML on erp, read/wr
 COMMENT ON ROLE erp_ai_agent   IS 'FastAPI AI service. EXECUTE on tools only, plus INSERT/UPDATE on its own trace tables. No table privileges on erp. No access to research.';
 COMMENT ON ROLE erp_researcher IS 'Evaluation harness and data generator. Full access including research gold labels.';
 COMMENT ON ROLE erp_readonly   IS 'Baseline A dashboards and manual SQL analytics.';
+COMMENT ON ROLE erp_tools_owner IS 'NOLOGIN owner of the tools functions. Read-only on erp, no access to research. SECURITY DEFINER therefore escalates a caller to "may read business data", never to superuser.';
 
 -- ---------------------------------------------------------------------
 -- Baseline: revoke public, then grant deliberately
@@ -86,6 +93,40 @@ GRANT USAGE ON ALL SEQUENCES IN SCHEMA erp      TO erp_researcher;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA ai       TO erp_researcher;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA research TO erp_researcher;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA erp, tools TO erp_researcher;
+
+-- ---------------------------------------------------------------------
+-- erp_tools_owner : the privilege ceiling for every SECURITY DEFINER
+-- function in tools. Read-only on erp, nothing on research.
+-- ---------------------------------------------------------------------
+GRANT USAGE ON SCHEMA erp, tools TO erp_tools_owner;
+GRANT SELECT ON ALL TABLES IN SCHEMA erp TO erp_tools_owner;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA erp TO erp_tools_owner;
+ALTER DEFAULT PRIVILEGES IN SCHEMA erp GRANT SELECT ON TABLES TO erp_tools_owner;
+
+REVOKE ALL ON SCHEMA research FROM erp_tools_owner;
+REVOKE ALL ON ALL TABLES IN SCHEMA research FROM erp_tools_owner;
+
+-- Hand every tools function over to that role. Left owned by postgres,
+-- SECURITY DEFINER would run the bodies with superuser rights, and a bug in
+-- any one of them would be a full compromise instead of a read.
+DO $$
+DECLARE
+    fn RECORD;
+BEGIN
+    FOR fn IN
+        SELECT p.oid::regprocedure AS sig
+          FROM pg_proc p
+          JOIN pg_namespace n ON n.oid = p.pronamespace
+         WHERE n.nspname = 'tools'
+    LOOP
+        EXECUTE format('ALTER FUNCTION %s OWNER TO erp_tools_owner', fn.sig);
+    END LOOP;
+END;
+$$;
+
+-- PG15+ already removes CREATE from PUBLIC on schema public; assert it,
+-- because public sits on the SECURITY DEFINER search_path for pg_trgm.
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 
 -- ---------------------------------------------------------------------
 -- erp_readonly : Baseline A

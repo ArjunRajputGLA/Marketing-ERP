@@ -1,6 +1,6 @@
 # Minimal ERP + Evidence-Grounded Multi-Agent AI — PostgreSQL Schema
 
-Seventeen SQL files, run in numeric order. Verified end-to-end on PostgreSQL 16: a full
+Twenty SQL files, run in numeric order. Verified end-to-end on PostgreSQL 16: a full
 teardown-and-rebuild followed by `16_smoke_test.sql` passes with every assertion green.
 
 **41 tables** (17 `erp`, 16 `ai`, 8 `research`), **14 views**, **17 controlled tool functions**.
@@ -16,6 +16,7 @@ createdb -U postgres erp_ai
 cd erp_schema
 psql -U postgres -d erp_ai -v ON_ERROR_STOP=1 -f 00_run_all.sql
 psql -U postgres -d erp_ai -v ON_ERROR_STOP=1 -f 16_smoke_test.sql
+psql -U postgres -d erp_ai -v ON_ERROR_STOP=1 -f 17_security_probe.sql
 ```
 
 ### pgAdmin 4
@@ -51,7 +52,8 @@ superuser for that file at minimum.
 | `13_controlled_tools.sql` | The 17 functions the AI service is allowed to call |
 | `14_security_roles_rls.sql` | Four database roles, grants, row-level security |
 | `15_seed_reference_data.sql` | Roles, three demo users, categories, baseline models, consensus weight profiles |
-| `16_smoke_test.sql` | Regression test. Run after every schema change. |
+| `16_smoke_test.sql` | Transaction-flow regression test. Run after every schema change. |
+| `17_security_probe.sql` | Six probes proving the AI role's access boundary. Run after any grant change. |
 | `99_teardown.sql` | Drop everything |
 
 ---
@@ -71,6 +73,11 @@ It can only `EXECUTE` functions in `tools`, and write its own trace rows in `ai`
 your leakage metric measures an enforced database guarantee rather than how well a prompt
 held up.
 
+The `tools` functions are `SECURITY DEFINER`, owned by **`erp_tools_owner`** — a NOLOGIN role
+with read-only access to `erp` and nothing on `research`. That is the privilege ceiling for
+every tool call: a bug in any tool function is a read of business data, never a write and
+never a superuser compromise. `17_security_probe.sql` asserts all of this in six probes.
+
 Connection strings:
 
 ```
@@ -78,6 +85,7 @@ erp_app         postgresql://erp_app:...@host/erp_ai          Next.js
 erp_ai_agent    postgresql://erp_ai_agent:...@host/erp_ai     FastAPI
 erp_researcher  postgresql://erp_researcher:...@host/erp_ai   generator + harness (BYPASSRLS)
 erp_readonly    postgresql://erp_readonly:...@host/erp_ai     Baseline A dashboards
+erp_tools_owner  (NOLOGIN)                                    owns the tools functions
 ```
 
 **Change the four placeholder passwords in `14` before anything leaves localhost.**
