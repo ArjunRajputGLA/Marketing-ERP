@@ -1,0 +1,23 @@
+# Environment variables
+.env
+.env*.local
+
+# Dependencies & Build (for future Next.js / Node)
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Python cache & venv
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
