@@ -210,14 +210,14 @@ export function Shell({ children, user }: ShellProps) {
                   type="button"
                   onClick={() => setCollapsed(true)}
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-700 via-blue-600 to-sky-400 shadow-md shadow-blue-500/25 text-white font-extrabold text-xl tracking-tighter cursor-pointer hover:shadow-lg transition-all active:scale-95"
-                  title="CONCENSUS ERP"
+                  title="CONSENSUS ERP"
                 >
                   <span className="transform -rotate-6 select-none font-sans">C</span>
                 </button>
 
                 <div className="transition-opacity duration-200 overflow-hidden">
                   <div className="font-extrabold text-base tracking-tight text-slate-900 flex items-center gap-1.5">
-                    CONCENSUS
+                    CONSENSUS
                   </div>
                   <div className="text-[11px] font-medium text-slate-400 tracking-tight">
                     ERP Solution
