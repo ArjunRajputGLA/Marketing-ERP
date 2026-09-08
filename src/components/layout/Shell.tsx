@@ -25,7 +25,6 @@ import {
   Check,
   ChevronsLeft,
   ChevronsRight,
-  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -44,9 +43,8 @@ export function Shell({ children, user }: ShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isSwitching, setIsSwitching] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-  const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   // Submenu toggle for Inventory
   const isInventoryActive = pathname.startsWith("/inventory") || pathname === "/master";
@@ -56,24 +54,6 @@ export function Shell({ children, user }: ShellProps) {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
     router.refresh();
-  };
-
-  const handleQuickRoleSwitch = async (targetUsername: string) => {
-    setIsSwitching(true);
-    try {
-      await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: targetUsername,
-          password: "Password@123",
-        }),
-      });
-      router.refresh();
-      window.location.reload();
-    } catch {
-      setIsSwitching(false);
-    }
   };
 
   // Breadcrumb generator
@@ -687,9 +667,9 @@ export function Shell({ children, user }: ShellProps) {
             <div className="relative flex justify-center">
               <button
                 type="button"
-                onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
+                onClick={() => setShowUserMenu(!showUserMenu)}
                 className="group relative h-11 w-11 rounded-full bg-slate-900 text-white font-bold text-sm flex items-center justify-center shadow-md shadow-slate-900/15 cursor-pointer hover:scale-105 hover:ring-2 hover:ring-sky-500 transition-all active:scale-95"
-                title={`${user.fullName} (${user.roleCode}) - Click to switch role`}
+                title={`${user.fullName} (${user.roleCode})`}
               >
                 <span className="font-mono tracking-tight font-extrabold text-slate-100">
                   {user.fullName.slice(0, 1).toUpperCase()}
@@ -707,7 +687,7 @@ export function Shell({ children, user }: ShellProps) {
           ) : (
             /* Expanded Profile Card */
             <div
-              onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
+              onClick={() => setShowUserMenu(!showUserMenu)}
               className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
@@ -730,49 +710,34 @@ export function Shell({ children, user }: ShellProps) {
                 </div>
               </div>
 
-              <ChevronRight className="h-4 w-4 text-slate-400 shrink-0" />
+              <ChevronRight className={`h-4 w-4 text-slate-400 shrink-0 transition-transform duration-200 ${showUserMenu ? "-rotate-90" : ""}`} />
             </div>
           )}
 
-          {/* Quick Role Switcher Dropdown */}
-          {showRoleSwitcher && (
+          {/* User Profile Dropdown with Sign Out */}
+          {showUserMenu && (
             <div
-              className={`absolute bottom-16 p-3 bg-white rounded-2xl border border-slate-200 shadow-2xl z-50 space-y-2.5 ${
-                collapsed ? "left-20 ml-2 w-56" : "left-3 right-3"
+              className={`absolute bottom-16 p-2 bg-white rounded-2xl border border-slate-200 shadow-xl z-50 space-y-1.5 ${
+                collapsed ? "left-20 ml-2 w-52" : "left-3 right-3"
               }`}
             >
-              <div className="text-[11px] font-bold text-slate-800 flex items-center justify-between">
-                <span>Switch Research Role:</span>
-                {isSwitching && <RefreshCw className="h-3 w-3 animate-spin text-sky-500" />}
+              <div className="px-2.5 py-2 border-b border-slate-100">
+                <div className="text-xs font-bold text-slate-900 truncate">
+                  {user.fullName}
+                </div>
+                <div className="text-[10px] text-slate-400 font-medium truncate">
+                  {user.roleName} &bull; @{user.username}
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(["admin", "manager", "staff"] as const).map((u) => (
-                  <button
-                    key={u}
-                    type="button"
-                    disabled={isSwitching || user.username === u}
-                    onClick={() => handleQuickRoleSwitch(u)}
-                    className={`text-[10px] py-1.5 px-1 rounded-xl font-medium border text-center transition-all ${
-                      user.username === u
-                        ? "bg-sky-500 text-white border-sky-500 font-semibold shadow-xs"
-                        : "bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700"
-                    }`}
-                  >
-                    {u}
-                  </button>
-                ))}
-              </div>
-              <div className="pt-2 border-t border-slate-100">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="w-full justify-start text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 h-8 rounded-xl"
-                >
-                  <LogOut className="h-3.5 w-3.5 mr-2" />
-                  Sign Out
-                </Button>
-              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="w-full justify-start text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 h-8 rounded-xl font-medium"
+              >
+                <LogOut className="h-3.5 w-3.5 mr-2" />
+                Sign Out
+              </Button>
             </div>
           )}
         </div>
