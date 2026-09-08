@@ -87,7 +87,7 @@ export function InventoryClient() {
       <div className="flex h-72 items-center justify-center">
         <div className="flex items-center gap-3 text-slate-500 text-sm font-medium">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
-          Loading Vantus Inventory Registry...
+          Loading CONCENSUS Inventory Registry...
         </div>
       </div>
     );

@@ -178,15 +178,15 @@ export function Shell({ children, user }: ShellProps) {
         <div className={`flex h-20 shrink-0 items-center border-b border-slate-100 ${collapsed ? "justify-center px-0 w-full" : "justify-between px-4"}`}>
           <div className={`flex items-center ${collapsed ? "justify-center w-full" : "gap-3 overflow-hidden"}`}>
             {collapsed ? (
-              /* When collapsed: V logo normally, replaced by expanding button on hover */
+              /* When collapsed: C logo normally, replaced by expanding button on hover */
               <div
                 onClick={() => setCollapsed(false)}
                 className="relative h-11 w-11 flex items-center justify-center group cursor-pointer"
                 title="Expand sidebar"
               >
-                {/* V Logo */}
+                {/* C Logo */}
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-700 via-blue-600 to-sky-400 shadow-md shadow-blue-500/25 text-white font-extrabold text-xl tracking-tighter transition-all duration-200 group-hover:opacity-0 group-hover:scale-90 group-hover:pointer-events-none">
-                  <span className="transform -rotate-6 select-none font-sans">V</span>
+                  <span className="transform -rotate-6 select-none font-sans">C</span>
                 </div>
 
                 {/* Expanding Button (same UI as collapsing button) */}
@@ -204,20 +204,20 @@ export function Shell({ children, user }: ShellProps) {
                 </button>
               </div>
             ) : (
-              /* When expanded: standard V logo with branding text */
+              /* When expanded: standard C logo with branding text */
               <>
                 <button
                   type="button"
                   onClick={() => setCollapsed(true)}
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-700 via-blue-600 to-sky-400 shadow-md shadow-blue-500/25 text-white font-extrabold text-xl tracking-tighter cursor-pointer hover:shadow-lg transition-all active:scale-95"
-                  title="Vantus ERP"
+                  title="CONCENSUS ERP"
                 >
-                  <span className="transform -rotate-6 select-none font-sans">V</span>
+                  <span className="transform -rotate-6 select-none font-sans">C</span>
                 </button>
 
                 <div className="transition-opacity duration-200 overflow-hidden">
                   <div className="font-extrabold text-base tracking-tight text-slate-900 flex items-center gap-1.5">
-                    VANTUS
+                    CONCENSUS
                   </div>
                   <div className="text-[11px] font-medium text-slate-400 tracking-tight">
                     ERP Solution

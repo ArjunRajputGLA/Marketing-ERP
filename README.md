@@ -15,7 +15,7 @@ An authoritative enterprise resource planning (ERP) system integrated with a ver
 - **Complete Business Operations**: Seamless lifecycle for Sales Invoicing, Purchasing & Vendor Bills, Inventory Movement Ledger, Operating Expenses & Cashflow, Master Data, and Executive P&L Reporting.
 - **Evidence-Grounded Multi-Agent AI**: Specialized autonomous analytical agents (Inventory, Sales & Demand, Finance & Margin, Supplier & Risk, Executive Synthesizer) generating grounded findings with mathematical evidence traces.
 - **Enforced Security Isolation**: Complete database-level privilege boundary. AI agents access business data **strictly** via 17 audited `SECURITY DEFINER` tools in a dedicated `tools` schema with **zero** direct table privileges on `erp` or `research` schemas.
-- **Vantus Modern Design Aesthetic**: Sleek desktop shell layout with fixed sidebar, smooth collapse/expand animations, isolated content scrolling, responsive mobile drawer, and interactive role switching.
+- **CONCENSUS Modern Design Aesthetic**: Sleek desktop shell layout with fixed sidebar, smooth collapse/expand animations, isolated content scrolling, responsive mobile drawer, and interactive role switching.
 - **Deterministic Analytics**: 14 PostgreSQL views providing transparent, unhallucinated baselines for executive KPI tracking and research benchmarking.
 
 ---
