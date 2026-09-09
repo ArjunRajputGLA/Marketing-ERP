@@ -152,6 +152,24 @@ export function Shell({ children, user }: ShellProps) {
         </div>
       );
     }
+    if (pathname.startsWith("/system-invariants")) {
+      return (
+        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+          <Link href="/system-invariants" className="hover:text-slate-900 transition-colors">System Invariants</Link>
+          <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+          <span className="text-slate-900 font-semibold">Integrity & Guarantees</span>
+        </div>
+      );
+    }
+    if (pathname.startsWith("/support")) {
+      return (
+        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+          <Link href="/support" className="hover:text-slate-900 transition-colors">Support & Docs</Link>
+          <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+          <span className="text-slate-900 font-semibold">Operating Reference</span>
+        </div>
+      );
+    }
     return (
       <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
         <span>ERP Solution</span>
@@ -173,6 +191,8 @@ export function Shell({ children, user }: ShellProps) {
     if (pathname.startsWith("/reports")) return "Reporting";
     if (pathname.startsWith("/ai-assistant")) return "AI Decision Support";
     if (pathname.startsWith("/admin")) return "Administration";
+    if (pathname.startsWith("/system-invariants")) return "System Invariants";
+    if (pathname.startsWith("/support")) return "Support & Docs";
     return "Dashboard";
   };
 
@@ -321,9 +341,6 @@ export function Shell({ children, user }: ShellProps) {
                     />
                     {!collapsed && <span className="truncate">Accounting</span>}
                   </div>
-                  {!collapsed && (
-                    <ChevronRight className={`h-3.5 w-3.5 ${pathname.startsWith("/finance") ? "text-white/80" : "text-slate-400"}`} />
-                  )}
                   {collapsed && (
                     <div className="absolute left-full ml-3 px-2.5 py-1 bg-slate-900 text-white text-[11px] font-medium rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-150 -translate-x-1 group-hover:translate-x-0">
                       Accounting
@@ -358,9 +375,6 @@ export function Shell({ children, user }: ShellProps) {
                     />
                     {!collapsed && <span className="truncate">Purchasing</span>}
                   </div>
-                  {!collapsed && (
-                    <ChevronRight className={`h-3.5 w-3.5 ${pathname.startsWith("/purchases") ? "text-white/80" : "text-slate-400"}`} />
-                  )}
                   {collapsed && (
                     <div className="absolute left-full ml-3 px-2.5 py-1 bg-slate-900 text-white text-[11px] font-medium rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-150 -translate-x-1 group-hover:translate-x-0">
                       Purchasing
@@ -394,9 +408,6 @@ export function Shell({ children, user }: ShellProps) {
                   />
                   {!collapsed && <span className="truncate">Sales</span>}
                 </div>
-                {!collapsed && (
-                  <ChevronRight className={`h-3.5 w-3.5 ${pathname.startsWith("/sales") ? "text-white/80" : "text-slate-400"}`} />
-                )}
                 {collapsed && (
                   <div className="absolute left-full ml-3 px-2.5 py-1 bg-slate-900 text-white text-[11px] font-medium rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-150 -translate-x-1 group-hover:translate-x-0">
                     Sales Invoices
@@ -524,7 +535,6 @@ export function Shell({ children, user }: ShellProps) {
                     />
                     {!collapsed && <span className="truncate">Master Data</span>}
                   </div>
-                  {!collapsed && <ChevronRight className="h-3.5 w-3.5 text-slate-400" />}
                   {collapsed && (
                     <div className="absolute left-full ml-3 px-2.5 py-1 bg-slate-900 text-white text-[11px] font-medium rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-150 -translate-x-1 group-hover:translate-x-0">
                       Master Data
@@ -559,9 +569,6 @@ export function Shell({ children, user }: ShellProps) {
                     />
                     {!collapsed && <span className="truncate">Reporting</span>}
                   </div>
-                  {!collapsed && (
-                    <ChevronRight className={`h-3.5 w-3.5 ${pathname.startsWith("/reports") ? "text-white/80" : "text-slate-400"}`} />
-                  )}
                   {collapsed && (
                     <div className="absolute left-full ml-3 px-2.5 py-1 bg-slate-900 text-white text-[11px] font-medium rounded-lg shadow-xl whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-150 -translate-x-1 group-hover:translate-x-0">
                       Reporting & P&L
@@ -662,15 +669,29 @@ export function Shell({ children, user }: ShellProps) {
 
             <nav className={collapsed ? "space-y-2 flex flex-col items-center" : "space-y-1"}>
               <Link
-                href="/inventory"
+                href="/system-invariants"
                 className={`group relative flex items-center transition-all ${
                   collapsed
-                    ? "w-11 h-11 justify-center rounded-2xl text-slate-400 hover:text-slate-700 hover:bg-slate-100/80"
-                    : "justify-between rounded-xl px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    ? `w-11 h-11 justify-center rounded-2xl ${
+                        pathname.startsWith("/system-invariants")
+                          ? "bg-sky-500 text-white shadow-md shadow-sky-500/30 font-semibold"
+                          : "text-slate-400 hover:text-slate-700 hover:bg-slate-100/80"
+                      }`
+                    : `justify-between rounded-xl px-3 py-2 text-xs font-medium ${
+                        pathname.startsWith("/system-invariants")
+                          ? "bg-sky-500 text-white font-semibold shadow-sm shadow-sky-500/25"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                      }`
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Sliders className="h-[18px] w-[18px] shrink-0 text-slate-400 group-hover:text-slate-700 transition-colors" />
+                  <Sliders
+                    className={`h-[18px] w-[18px] shrink-0 transition-colors ${
+                      pathname.startsWith("/system-invariants")
+                        ? "text-white"
+                        : "text-slate-400 group-hover:text-slate-700"
+                    }`}
+                  />
                   {!collapsed && <span className="truncate">System Invariants</span>}
                 </div>
                 {collapsed && (
@@ -680,15 +701,29 @@ export function Shell({ children, user }: ShellProps) {
                 )}
               </Link>
               <Link
-                href="/ai-assistant"
+                href="/support"
                 className={`group relative flex items-center transition-all ${
                   collapsed
-                    ? "w-11 h-11 justify-center rounded-2xl text-slate-400 hover:text-slate-700 hover:bg-slate-100/80"
-                    : "justify-between rounded-xl px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    ? `w-11 h-11 justify-center rounded-2xl ${
+                        pathname.startsWith("/support")
+                          ? "bg-sky-500 text-white shadow-md shadow-sky-500/30 font-semibold"
+                          : "text-slate-400 hover:text-slate-700 hover:bg-slate-100/80"
+                      }`
+                    : `justify-between rounded-xl px-3 py-2 text-xs font-medium ${
+                        pathname.startsWith("/support")
+                          ? "bg-sky-500 text-white font-semibold shadow-sm shadow-sky-500/25"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                      }`
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Headphones className="h-[18px] w-[18px] shrink-0 text-slate-400 group-hover:text-slate-700 transition-colors" />
+                  <Headphones
+                    className={`h-[18px] w-[18px] shrink-0 transition-colors ${
+                      pathname.startsWith("/support")
+                        ? "text-white"
+                        : "text-slate-400 group-hover:text-slate-700"
+                    }`}
+                  />
                   {!collapsed && <span className="truncate">Support & Docs</span>}
                 </div>
                 {collapsed && (
@@ -862,6 +897,8 @@ export function Shell({ children, user }: ShellProps) {
                   { name: "Master Data", href: "/master" },
                   { name: "Reports & P&L", href: "/reports" },
                   { name: "AI Decision Support", href: "/ai-assistant" },
+                  { name: "System Invariants", href: "/system-invariants" },
+                  { name: "Support & Docs", href: "/support" },
                 ].map((item) => (
                   <Link
                     key={item.name}
