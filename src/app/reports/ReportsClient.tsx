@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { Loader } from "@/components/ui/loader";
 
 export function ReportsClient() {
   const [activeView, setActiveView] = useState<"profit" | "product" | "customer" | "supplier">("profit");
@@ -92,8 +93,8 @@ export function ReportsClient() {
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <div className="py-20 text-center text-xs text-slate-400 font-medium">
-              Executing deterministic analytical database view...
+            <div className="py-12 flex justify-center">
+              <Loader size="sm" text="Executing deterministic analytical database view..." />
             </div>
           ) : activeView === "profit" ? (
             /* Monthly P&L View */

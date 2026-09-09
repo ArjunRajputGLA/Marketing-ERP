@@ -29,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Loader } from "@/components/ui/loader";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 interface SaleDetailClientProps {
@@ -118,8 +119,8 @@ export function SaleDetailClient({ invoiceId, userRole }: SaleDetailClientProps)
 
   if (loading) {
     return (
-      <div className="py-24 text-center text-xs text-slate-400 font-medium">
-        Loading invoice #{invoiceId}...
+      <div className="py-24 flex justify-center">
+        <Loader text={`Loading invoice #${invoiceId}...`} />
       </div>
     );
   }
@@ -146,7 +147,8 @@ export function SaleDetailClient({ invoiceId, userRole }: SaleDetailClientProps)
   );
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <>
+      <div className="max-w-6xl mx-auto space-y-6">
       {/* Top action header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -488,10 +490,11 @@ export function SaleDetailClient({ invoiceId, userRole }: SaleDetailClientProps)
           )}
         </CardContent>
       </Card>
+    </div>
 
-      {/* Record Payment Modal */}
-      {showPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    {/* Record Payment Modal */}
+    {showPaymentModal && (
+      <div className="fixed inset-0 z-50 !m-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden">
             <div className="p-5 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -577,6 +580,6 @@ export function SaleDetailClient({ invoiceId, userRole }: SaleDetailClientProps)
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

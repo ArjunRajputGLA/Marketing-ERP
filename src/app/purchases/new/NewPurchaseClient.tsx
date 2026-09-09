@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
+import { Loader } from "@/components/ui/loader";
 
 interface PurchaseItemInput {
   productId: number;
@@ -172,8 +173,8 @@ export function NewPurchaseClient() {
 
   if (loadingInitial) {
     return (
-      <div className="py-20 text-center text-xs text-slate-400 font-medium">
-        Loading suppliers and catalog...
+      <div className="py-20 flex justify-center">
+        <Loader text="Loading suppliers and catalog..." />
       </div>
     );
   }

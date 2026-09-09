@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCurrency } from "@/lib/utils";
+import { Loader } from "@/components/ui/loader";
 
 export function MasterClient() {
   const [tab, setTab] = useState<"PRODUCTS" | "CUSTOMERS" | "SUPPLIERS" | "CATEGORIES">("PRODUCTS");
@@ -204,7 +205,8 @@ export function MasterClient() {
   );
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -311,8 +313,8 @@ export function MasterClient() {
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <div className="py-16 text-center text-xs text-slate-400 font-medium">
-              Loading master entities...
+            <div className="py-12 flex justify-center">
+              <Loader size="sm" text="Loading master entities..." />
             </div>
           ) : tab === "PRODUCTS" ? (
             /* Products Table */
@@ -490,10 +492,11 @@ export function MasterClient() {
           )}
         </CardContent>
       </Card>
+    </div>
 
-      {/* Add Product Modal */}
-      {showProductModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    {/* Add Product Modal */}
+    {showProductModal && (
+      <div className="fixed inset-0 z-50 !m-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden">
             <div className="p-5 border-b border-slate-100 flex items-center gap-2">
               <div className="h-8 w-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
@@ -615,7 +618,7 @@ export function MasterClient() {
 
       {/* Add Customer Modal */}
       {showCustomerModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 !m-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden">
             <div className="p-5 border-b border-slate-100 flex items-center gap-2">
               <div className="h-8 w-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
@@ -708,7 +711,7 @@ export function MasterClient() {
 
       {/* Add Supplier Modal */}
       {showSupplierModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 !m-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden">
             <div className="p-5 border-b border-slate-100 flex items-center gap-2">
               <div className="h-8 w-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
@@ -795,6 +798,6 @@ export function MasterClient() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

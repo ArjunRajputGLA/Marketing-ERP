@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { Loader } from "@/components/ui/loader";
 
 export function FinanceClient() {
   const [activeTab, setActiveTab] = useState<"EXPENSES" | "PAYMENTS">("EXPENSES");
@@ -111,8 +112,9 @@ export function FinanceClient() {
     .reduce((sum, p) => sum + Number(p.amount || 0), 0);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <>
+      <div className="space-y-6">
+        {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
@@ -233,8 +235,8 @@ export function FinanceClient() {
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <div className="py-16 text-center text-xs text-slate-400 font-medium">
-              Loading financial transactions...
+            <div className="py-12 flex justify-center">
+              <Loader size="sm" text="Loading financial transactions..." />
             </div>
           ) : activeTab === "EXPENSES" ? (
             /* Expenses Table */
@@ -363,120 +365,121 @@ export function FinanceClient() {
           )}
         </CardContent>
       </Card>
+    </div>
 
-      {/* Record Expense Modal */}
-      {showExpenseModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden">
-            <div className="p-5 border-b border-slate-100 flex items-center gap-2">
-              <div className="h-8 w-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
-                <DollarSign className="h-4 w-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">Record Operating Expense</h3>
-                <p className="text-[11px] text-slate-500">Direct operational spend entry</p>
-              </div>
+    {/* Record Expense Modal */}
+    {showExpenseModal && (
+      <div className="fixed inset-0 z-50 !m-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden">
+          <div className="p-5 border-b border-slate-100 flex items-center gap-2">
+            <div className="h-8 w-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+              <DollarSign className="h-4 w-4" />
             </div>
-            <form onSubmit={handleCreateExpense}>
-              <div className="p-5 space-y-4">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">Record Operating Expense</h3>
+              <p className="text-[11px] text-slate-500">Direct operational spend entry</p>
+            </div>
+          </div>
+          <form onSubmit={handleCreateExpense}>
+            <div className="p-5 space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-600">Expense Category</label>
+                <select
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(Number(e.target.value))}
+                  className="w-full h-10 rounded-xl border border-slate-200/80 bg-white px-3 py-2 text-xs text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                >
+                  {categories.map((c) => (
+                    <option key={c.expense_category_id} value={c.expense_category_id}>
+                      {c.name} ({c.is_fixed_cost ? "Fixed" : "Variable"})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-600">Amount (₹)</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  placeholder="0.00"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  required
+                  className="h-10 rounded-xl border-slate-200/80 focus-visible:ring-sky-500 font-mono"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-600">Vendor / Payee</label>
+                <Input
+                  placeholder="e.g. AWS Cloud, DTDC Logistics, Office Landlord"
+                  value={vendorName}
+                  onChange={(e) => setVendorName(e.target.value)}
+                  className="h-10 rounded-xl border-slate-200/80 focus-visible:ring-sky-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-600">Description</label>
+                <Input
+                  placeholder="e.g. Monthly cloud server infrastructure compute"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="h-10 rounded-xl border-slate-200/80 focus-visible:ring-sky-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-600">Expense Category</label>
+                  <label className="text-xs font-semibold text-slate-600">Payment Mode</label>
                   <select
-                    value={categoryId}
-                    onChange={(e) => setCategoryId(Number(e.target.value))}
-                    className="w-full h-10 rounded-xl border border-slate-200/80 bg-white px-3 py-2 text-xs text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-full h-10 rounded-xl border border-slate-200/80 bg-white px-2.5 py-1 text-xs text-slate-900"
                   >
-                    {categories.map((c) => (
-                      <option key={c.expense_category_id} value={c.expense_category_id}>
-                        {c.name} ({c.is_fixed_cost ? "Fixed" : "Variable"})
-                      </option>
-                    ))}
+                    <option value="BANK_TRANSFER">Bank Transfer</option>
+                    <option value="UPI">UPI</option>
+                    <option value="CARD">Card</option>
+                    <option value="CASH">Cash</option>
                   </select>
                 </div>
-
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-600">Amount (₹)</label>
+                  <label className="text-xs font-semibold text-slate-600">Reference #</label>
                   <Input
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    placeholder="0.00"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    required
-                    className="h-10 rounded-xl border-slate-200/80 focus-visible:ring-sky-500 font-mono"
+                    placeholder="Ref / UTR"
+                    value={refNo}
+                    onChange={(e) => setRefNo(e.target.value)}
+                    className="h-10 rounded-xl border-slate-200/80 text-xs"
                   />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-600">Vendor / Payee</label>
-                  <Input
-                    placeholder="e.g. AWS Cloud, DTDC Logistics, Office Landlord"
-                    value={vendorName}
-                    onChange={(e) => setVendorName(e.target.value)}
-                    className="h-10 rounded-xl border-slate-200/80 focus-visible:ring-sky-500"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-600">Description</label>
-                  <Input
-                    placeholder="e.g. Monthly cloud server infrastructure compute"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="h-10 rounded-xl border-slate-200/80 focus-visible:ring-sky-500"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-600">Payment Mode</label>
-                    <select
-                      value={paymentMethod}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-full h-10 rounded-xl border border-slate-200/80 bg-white px-2.5 py-1 text-xs text-slate-900"
-                    >
-                      <option value="BANK_TRANSFER">Bank Transfer</option>
-                      <option value="UPI">UPI</option>
-                      <option value="CARD">Card</option>
-                      <option value="CASH">Cash</option>
-                    </select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-slate-600">Reference #</label>
-                    <Input
-                      placeholder="Ref / UTR"
-                      value={refNo}
-                      onChange={(e) => setRefNo(e.target.value)}
-                      className="h-10 rounded-xl border-slate-200/80 text-xs"
-                    />
-                  </div>
                 </div>
               </div>
+            </div>
 
-              <div className="flex items-center justify-end gap-2.5 p-4 border-t border-slate-100 bg-slate-50/50">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowExpenseModal(false)}
-                  className="rounded-xl border-slate-200 text-xs"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  size="sm"
-                  disabled={savingExpense}
-                  className="rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-medium text-xs shadow-xs"
-                >
-                  {savingExpense ? "Saving..." : "Save Expense"}
-                </Button>
-              </div>
-            </form>
-          </div>
+            <div className="flex items-center justify-end gap-2.5 p-4 border-t border-slate-100 bg-slate-50/50">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowExpenseModal(false)}
+                className="rounded-xl border-slate-200 text-xs"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={savingExpense}
+                className="rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-medium text-xs shadow-xs"
+              >
+                {savingExpense ? "Saving..." : "Save Expense"}
+              </Button>
+            </div>
+          </form>
         </div>
-      )}
-    </div>
-  );
+      </div>
+    )}
+  </>
+);
 }

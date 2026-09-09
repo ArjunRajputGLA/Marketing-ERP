@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { Loader } from "@/components/ui/loader";
 
 export function PurchasesListClient() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -167,8 +168,8 @@ export function PurchasesListClient() {
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <div className="py-16 text-center text-xs text-slate-400 font-medium">
-              Loading purchase invoices...
+            <div className="py-12 flex justify-center">
+              <Loader size="sm" text="Loading purchase invoices..." />
             </div>
           ) : filtered.length === 0 ? (
             <div className="py-16 text-center text-xs text-slate-500">

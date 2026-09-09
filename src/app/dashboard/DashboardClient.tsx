@@ -29,6 +29,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import Loader from "@/components/ui/loader";
 
 interface DashboardClientProps {
   userRole: string;
@@ -49,14 +50,7 @@ export function DashboardClient({ userRole }: DashboardClientProps) {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex h-72 items-center justify-center">
-        <div className="flex items-center gap-3 text-slate-500 text-sm font-medium">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
-          Loading authoritative ERP metrics...
-        </div>
-      </div>
-    );
+    return <Loader text="Loading authoritative ERP metrics..." />;
   }
 
   const stats = data?.stats || {};

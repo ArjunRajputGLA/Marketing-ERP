@@ -47,7 +47,7 @@ export function Shell({ children, user }: ShellProps) {
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   // Submenu toggle for Inventory
-  const isInventoryActive = pathname.startsWith("/inventory") || pathname === "/master";
+  const isInventoryActive = pathname.startsWith("/inventory");
   const [inventoryOpen, setInventoryOpen] = useState(true);
 
   const handleLogout = async () => {
@@ -58,6 +58,33 @@ export function Shell({ children, user }: ShellProps) {
 
   // Breadcrumb generator
   const getBreadcrumbs = () => {
+    if (pathname === "/inventory/movements") {
+      return (
+        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+          <Link href="/inventory" className="hover:text-slate-900 transition-colors">Inventory</Link>
+          <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+          <span className="text-slate-900 font-semibold">Stock Movements Ledger</span>
+        </div>
+      );
+    }
+    if (pathname === "/inventory/warehouses") {
+      return (
+        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+          <Link href="/inventory" className="hover:text-slate-900 transition-colors">Inventory</Link>
+          <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+          <span className="text-slate-900 font-semibold">Warehouses & Storage</span>
+        </div>
+      );
+    }
+    if (pathname === "/inventory/categories") {
+      return (
+        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+          <Link href="/inventory" className="hover:text-slate-900 transition-colors">Inventory</Link>
+          <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+          <span className="text-slate-900 font-semibold">Product Categories</span>
+        </div>
+      );
+    }
     if (pathname.startsWith("/inventory")) {
       return (
         <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
@@ -135,6 +162,9 @@ export function Shell({ children, user }: ShellProps) {
   };
 
   const getPageTitle = () => {
+    if (pathname === "/inventory/movements") return "Stock Movements";
+    if (pathname === "/inventory/warehouses") return "Warehouses";
+    if (pathname === "/inventory/categories") return "Product Categories";
     if (pathname.startsWith("/inventory")) return "Products";
     if (pathname.startsWith("/sales")) return "Sales Invoices";
     if (pathname.startsWith("/purchases")) return "Purchasing";
@@ -426,7 +456,7 @@ export function Shell({ children, user }: ShellProps) {
                     <Link
                       href="/inventory"
                       className={`tree-line-item block py-1.5 pl-2 text-xs font-medium transition-colors ${
-                        pathname === "/inventory"
+                        pathname === "/inventory" || pathname === "/inventory/products"
                           ? "text-sky-600 font-semibold"
                           : "text-slate-600 hover:text-slate-900"
                       }`}
@@ -434,19 +464,30 @@ export function Shell({ children, user }: ShellProps) {
                       Products
                     </Link>
                     <Link
-                      href="/inventory#ledger"
-                      className="tree-line-item block py-1.5 pl-2 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                      href="/inventory/movements"
+                      className={`tree-line-item block py-1.5 pl-2 text-xs font-medium transition-colors ${
+                        pathname === "/inventory/movements"
+                          ? "text-sky-600 font-semibold"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
                     >
                       Stock Movements
                     </Link>
-                    <div className="tree-line-item py-1.5 pl-2 text-xs font-medium text-slate-600 flex items-center justify-between pr-2">
+                    <Link
+                      href="/inventory/warehouses"
+                      className={`tree-line-item py-1.5 pl-2 text-xs font-medium transition-colors flex items-center justify-between pr-2 ${
+                        pathname === "/inventory/warehouses"
+                          ? "text-sky-600 font-semibold"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
                       <span>Warehouses</span>
                       <span className="text-[10px] text-emerald-600 font-mono font-semibold">WH-MAIN</span>
-                    </div>
+                    </Link>
                     <Link
-                      href="/master"
+                      href="/inventory/categories"
                       className={`tree-line-item block py-1.5 pl-2 text-xs font-medium transition-colors ${
-                        pathname === "/master"
+                        pathname === "/inventory/categories"
                           ? "text-sky-600 font-semibold"
                           : "text-slate-600 hover:text-slate-900"
                       }`}
@@ -802,7 +843,7 @@ export function Shell({ children, user }: ShellProps) {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm pt-20 p-4">
+          <div className="lg:hidden fixed inset-0 z-50 !m-0 bg-slate-900/40 backdrop-blur-sm pt-20 p-4">
             <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-5 space-y-4 max-h-[85vh] overflow-y-auto">
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <span className="font-bold text-slate-900">Navigation Menu</span>

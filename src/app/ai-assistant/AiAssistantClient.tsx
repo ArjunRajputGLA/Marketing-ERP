@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Loader } from "@/components/ui/loader";
 
 interface AiAssistantClientProps {
   userRole: "ADMIN" | "MANAGER" | "USER";
@@ -262,6 +263,12 @@ export function AiAssistantClient({ userRole, userId }: AiAssistantClientProps) 
                   {executing ? "Executing in DB Sandbox..." : "Run Security Definer Probe"}
                 </Button>
               </div>
+
+              {executing && (
+                <div className="py-6 flex justify-center">
+                  <Loader size="sm" text="Executing query probe in database sandbox..." />
+                </div>
+              )}
 
               {/* Execution Result Terminal Display */}
               {execResult && (

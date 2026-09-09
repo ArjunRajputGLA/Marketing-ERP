@@ -26,6 +26,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import Loader from "@/components/ui/loader";
 
 export function InventoryClient() {
   const [products, setProducts] = useState<any[]>([]);
@@ -50,14 +51,22 @@ export function InventoryClient() {
   const loadData = () => {
     setLoading(true);
     fetch("/api/inventory")
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Failed to load inventory");
+        return res.json();
+      })
       .then((data) => {
         const prods = data.products || [];
         setProducts(prods);
         setLedger(data.ledger || []);
         if (prods.length > 0) {
           // Select default item or table if available
-          const found = prods.find((p: any) => p.sku.toLowerCase().includes("tbl") || p.sku.toLowerCase().includes("leg")) || prods[0];
+          const found =
+            prods.find(
+              (p: any) =>
+                p.sku.toLowerCase().includes("tbl") ||
+                p.sku.toLowerCase().includes("leg")
+            ) || prods[0];
           setSelectedProduct(found);
         }
         setLoading(false);
@@ -82,13 +91,23 @@ export function InventoryClient() {
     }
   };
 
-  if (loading || !selectedProduct) {
+  if (loading) {
+    return <Loader text="Loading Products & Stock Registry..." />;
+  }
+
+  if (!selectedProduct && products.length === 0) {
     return (
-      <div className="flex h-72 items-center justify-center">
-        <div className="flex items-center gap-3 text-slate-500 text-sm font-medium">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
-          Loading CONSENSUS Inventory Registry...
-        </div>
+      <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 shadow-xs">
+        <Package className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+        <h3 className="text-sm font-bold text-slate-900">No Products in Registry</h3>
+        <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+          Add products via Master Data or seed initial inventory items.
+        </p>
+        <Link href="/master">
+          <Button size="sm" className="mt-4 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs">
+            Go to Master Data
+          </Button>
+        </Link>
       </div>
     );
   }

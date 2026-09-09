@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { Loader } from "@/components/ui/loader";
 
 export function SalesListClient() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -87,8 +88,8 @@ export function SalesListClient() {
 
         <div>
           {loading ? (
-            <div className="py-12 text-center text-xs text-slate-400">
-              Loading sales invoices...
+            <div className="py-12 flex justify-center">
+              <Loader size="sm" text="Loading sales invoices..." />
             </div>
           ) : filtered.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-400">
